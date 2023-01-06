@@ -46,7 +46,7 @@ def iter_dataloader(data_loader: torch.utils.data.DataLoader):
     train_features, train_labels = next(iter(data_loader))
     print(f"Feature batch Shape: {train_features.size()}")
     print(f"Labels batch shape: {train_labels.size()}")
-    img = train_features[0].squeeze()
+    img = train_features[0].squeeze().permute(1, 2, 0)
     label = train_labels[0]
     plt.imshow(img, cmap="gray")
     plt.axis(False)

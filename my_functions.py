@@ -34,7 +34,7 @@ def show_data(data):
     cols, rows = 3, 3
     for i in range(1, cols * rows + 1):
         sample_idx = torch.randint(len(data), size=(1,)).item()
-        img, label = train_data[sample_idx]
+        img, label = data[sample_idx]
         figure.add_subplot(rows, cols, i)
         plt.title(labels_map[label], c="g")
         plt.imshow(img.squeeze(), cmap="gray")

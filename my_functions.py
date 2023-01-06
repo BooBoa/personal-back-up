@@ -15,6 +15,7 @@ from torchmetrics import ConfusionMatrix
 from mlxtend.plotting import plot_confusion_matrix
 import numpy as np
 
+device = "cuda" if torch.cuda.is_available() else "cpu"
 #def import_matrix():
 #  #try:
  #   import torchmetrics, mlxtend

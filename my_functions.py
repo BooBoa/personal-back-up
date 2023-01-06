@@ -35,9 +35,10 @@ def show_data(data):
     for i in range(1, cols * rows + 1):
         sample_idx = torch.randint(len(data), size=(1,)).item()
         img, label = data[sample_idx]
+        img = img.squeeze()
         figure.add_subplot(rows, cols, i)
         plt.title(labels_map[label], c="g")
-        plt.imshow(img.squeeze().permute(1, 2, 0), cmap="gray")
+        plt.imshow(img.permute(1, 2, 0), cmap="gray")
         plt.axis(False)
     plt.show()
 

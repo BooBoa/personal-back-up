@@ -37,7 +37,7 @@ def show_data(data):
         img, label = data[sample_idx]
         figure.add_subplot(rows, cols, i)
         plt.title(labels_map[label], c="g")
-        plt.imshow(img.squeeze(), cmap="gray")
+        plt.imshow(img.squeeze().permute(1, 2, 0), cmap="gray")
         plt.axis(False)
     plt.show()
 

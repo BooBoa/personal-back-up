@@ -15,15 +15,15 @@ from torchmetrics import ConfusionMatrix
 from mlxtend.plotting import plot_confusion_matrix
 import numpy as np
 
-def import_matrix():
-  try:
-    import torchmetrics, mlxtend
-    print(f"mlxend version: {mlxtend.__version__}")
-    assert int(mlxtend.__version__.split(".")[1] >= 19, "mlxtend version should be 0.19.0 or higher.")
-  except:
-    !pip install -q torchmetrics -U mlxtend
-    import torchmetrics, mlxtend
-    print(f"mlxtend version: {mlxtend.__version__}")
+#def import_matrix():
+#  #try:
+ #   import torchmetrics, mlxtend
+  #  print(f"mlxend version: {mlxtend.__version__}")
+   # assert int(mlxtend.__version__.split(".")[1] >= 19, "mlxtend version should be 0.19.0 or higher.")
+  #except:
+   # !pip install -q torchmetrics -U mlxtend
+   # import torchmetrics, mlxtend
+   # print(f"mlxtend version: {mlxtend.__version__}")
 
 
 def show_data(data):

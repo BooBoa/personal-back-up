@@ -220,9 +220,9 @@ def train(model: torch.nn.Module,
     
     # 2. Create empty results dictionary
     results = {"train_loss": [],
-        "train_acc": [],
-        "test_loss": [],
-        "test_acc": []
+               "train_acc": [],
+               "test_loss": [],
+               "test_acc": []
     }
     
     # 3. Loop through training and testing steps for a number of epochs
@@ -245,10 +245,10 @@ def train(model: torch.nn.Module,
         )
 
         # 5. Update results dictionary
-        results["train_loss"].append(train_loss)
-        results["train_acc"].append(train_acc)
-        results["test_loss"].append(test_loss)
-        results["test_acc"].append(test_acc)
+         results["train_loss"].append(train_loss)
+         results["train_acc"].append(train_acc)
+         results["test_loss"].append(test_loss)
+         results["test_acc"].append(test_acc)
 
     # 6. Return the filled results at the end of the epochs
     return results

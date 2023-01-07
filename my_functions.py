@@ -41,7 +41,46 @@ def show_data(data):
         plt.imshow(img.permute(1, 2, 0), cmap="gray")
         plt.axis(False)
     plt.show()
+    
+    
+def display_random_images(dataset: torch.utils.data.dataset.Dataset,
+                          classes: List[str] = None,
+                          n: int = 10,
+                          display_shape: bool = True,
+                          seed: int = None):
+    
+    # 2. Adjust display if n too high
+    if n > 10:
+        n = 10
+        display_shape = False
+        print(f"For display purposes, n shouldn't be larger than 10, setting to 10 and removing shape display.")
+    
+    # 3. Set random seed
+    if seed:
+        random.seed(seed)
 
+    # 4. Get random sample indexes
+    random_samples_idx = random.sample(range(len(dataset)), k=n)
+
+    # 5. Setup plot
+    plt.figure(figsize=(16, 8))
+
+    # 6. Loop through samples and display random samples 
+    for i, targ_sample in enumerate(random_samples_idx):
+        targ_image, targ_label = dataset[targ_sample][0], dataset[targ_sample][1]
+
+        # 7. Adjust image tensor shape for plotting: [color_channels, height, width] -> [color_channels, height, width]
+        targ_image_adjust = targ_image.permute(1, 2, 0)
+
+        # Plot adjusted samples
+        plt.subplot(1, n, i+1)
+        plt.imshow(targ_image_adjust)
+        plt.axis("off")
+        if classes:
+            title = f"class: {classes[targ_label]}"
+            if display_shape:
+                title = title + f"\nshape: {targ_image_adjust.shape}"
+        plt.title(title)
 
 def iter_dataloader(data_loader: torch.utils.data.DataLoader):
     train_features, train_labels = next(iter(data_loader))
@@ -60,74 +99,124 @@ def accuracy_fn(y_true, y_pred):
   acc = (correct/len(y_pred)) * 100
   return acc
 
-
-def train_loop(model: torch.nn.Module,
-               data_loader: torch.utils.data.DataLoader,
-               loss_fn: torch.nn.Module,
-               optimizer: torch.optim.Optimizer,
-               accuracy_fn,
-               device: torch.device = device):
-    """Performs a training step with model trying to learn on data_loader """
-    train_loss, train_acc = 0, 0
-
-    # Put model into training mode
+def train_step(model: torch.nn.Module, 
+               dataloader: torch.utils.data.DataLoader, 
+               loss_fn: torch.nn.Module, 
+               optimizer: torch.optim.Optimizer):
+    # Put model in train mode
     model.train()
-
-    for batch, (X, y) in enumerate(data_loader):
-        # Put data on target device
+    
+    # Setup train loss and train accuracy values
+    train_loss, train_acc = 0, 0
+    
+    # Loop through data loader data batches
+    for batch, (X, y) in enumerate(dataloader):
+        # Send data to target device
         X, y = X.to(device), y.to(device)
-        # Forward pass -> outputs raw logits
+
+        # 1. Forward pass
         y_pred = model(X)
-        # Calculate the loss and accuracy per batch
-        loss = loss_fn(y_pred,
-                       y)
-        train_loss += loss
-        train_acc += accuracy_fn(y_true=y,
-                                 y_pred=y_pred.argmax(dim=1))  # go from logits -> prediction labels using argmax()
-        # Zero gradients
+
+        # 2. Calculate  and accumulate loss
+        loss = loss_fn(y_pred, y)
+        train_loss += loss.item() 
+
+        # 3. Optimizer zero grad
         optimizer.zero_grad()
-        # Back propagation
+
+        # 4. Loss backward
         loss.backward()
-        # step the optimizer (once per batch)
+
+        # 5. Optimizer step
         optimizer.step()
 
-    # Divide total train loss and acc by length of train dataloader
-    train_loss /= len(data_loader)
-    train_acc /= len(data_loader)
-    print(f"Train loss: {train_loss:.5f} | Train acc: {train_acc:.2f}%")
+        # Calculate and accumulate accuracy metric across all batches
+        y_pred_class = torch.argmax(torch.softmax(y_pred, dim=1), dim=1)
+        train_acc += (y_pred_class == y).sum().item()/len(y_pred)
 
+    # Adjust metrics to get average loss and accuracy per batch 
+    train_loss = train_loss / len(dataloader)
+    train_acc = train_acc / len(dataloader)
+    return train_loss, train_acc
 
-# Testing loop
-
-def test_loop(model: torch.nn.Module,
-              data_loader: torch.utils.data.DataLoader,
-              loss_fn: torch.nn.Module,
-              accuracy_fn,
-              device: torch.device = device):
-    """Performs a testing loop step on model going over data_loader"""
-
+def test_step(model: torch.nn.Module, 
+              dataloader: torch.utils.data.DataLoader, 
+              loss_fn: torch.nn.Module):
+    # Put model in eval mode
+    model.eval() 
+    
+    # Setup test loss and test accuracy values
     test_loss, test_acc = 0, 0
-    # Put model into evaluation mode
-    model.eval()
-    # Turn on inference mode context manager
+    
+    # Turn on inference context manager
     with torch.inference_mode():
-        for X, y in data_loader:
+        # Loop through DataLoader batches
+        for batch, (X, y) in enumerate(dataloader):
             # Send data to target device
             X, y = X.to(device), y.to(device)
-            # Forward pass -> outputs raw logits
-            test_pred = model(X)
-            # Calculate the test loss and accuracy per batch
-            loss = loss_fn(test_pred,
-                           y)
-            test_loss += loss
-            test_acc += accuracy_fn(y_true=y,
-                                    y_pred=test_pred.argmax(dim=1))  # go from logits -> prediction labels using armax()
+    
+            # 1. Forward pass
+            test_pred_logits = model(X)
 
-        # Divide total test loss and acc by length of train dataloader
-        test_loss /= len(data_loader)
-        test_acc /= len(data_loader)
-        print(f"\nTest loss: {test_loss:.5f} | Test acc: {test_acc:.2f}%")
+            # 2. Calculate and accumulate loss
+            loss = loss_fn(test_pred_logits, y)
+            test_loss += loss.item()
+            
+            # Calculate and accumulate accuracy
+            test_pred_labels = test_pred_logits.argmax(dim=1)
+            test_acc += ((test_pred_labels == y).sum().item()/len(test_pred_labels))
+            
+    # Adjust metrics to get average loss and accuracy per batch 
+    test_loss = test_loss / len(dataloader)
+    test_acc = test_acc / len(dataloader)
+    return test_loss, test_acc
 
+ 
+ 
+def train(model: torch.nn.Module, 
+          train_dataloader: torch.utils.data.DataLoader, 
+          test_dataloader: torch.utils.data.DataLoader, 
+          optimizer: torch.optim.Optimizer,
+          loss_fn: torch.nn.Module = nn.CrossEntropyLoss(),
+          epochs: int = 5):
+    
+    # 2. Create empty results dictionary
+    results = {"train_loss": [],
+        "train_acc": [],
+        "test_loss": [],
+        "test_acc": []
+    }
+    
+    # 3. Loop through training and testing steps for a number of epochs
+    for epoch in tqdm(range(epochs)):
+        train_loss, train_acc = train_step(model=model,
+                                           dataloader=train_dataloader,
+                                           loss_fn=loss_fn,
+                                           optimizer=optimizer)
+        test_loss, test_acc = test_step(model=model,
+            dataloader=test_dataloader,
+            loss_fn=loss_fn)
+        
+        # 4. Print out what's happening
+        print(
+            f"Epoch: {epoch+1} | "
+            f"train_loss: {train_loss:.4f} | "
+            f"train_acc: {train_acc:.4f} | "
+            f"test_loss: {test_loss:.4f} | "
+            f"test_acc: {test_acc:.4f}"
+        )
+
+        # 5. Update results dictionary
+        results["train_loss"].append(train_loss)
+        results["train_acc"].append(train_acc)
+        results["test_loss"].append(test_loss)
+        results["test_acc"].append(test_acc)
+
+    # 6. Return the filled results at the end of the epochs
+    return results
+ 
+ 
+   
 
 def eval_model(model: torch.nn.Module,
                data_loader: torch.utils.data.DataLoader,
@@ -160,6 +249,48 @@ def eval_model(model: torch.nn.Module,
             "model_acc": f"{(100 * correct):.1f}%"
             }
 
+def plot_loss_curves(results: Dict[str, List[float]]):
+    """Plots training curves of a results dictionary.
+
+    Args:
+        results (dict): dictionary containing list of values, e.g.
+            {"train_loss": [...],
+             "train_acc": [...],
+             "test_loss": [...],
+             "test_acc": [...]}
+    """
+    
+    # Get the loss values of the results dictionary (training and test)
+    loss = results['train_loss']
+    test_loss = results['test_loss']
+
+    # Get the accuracy values of the results dictionary (training and test)
+    accuracy = results['train_acc']
+    test_accuracy = results['test_acc']
+
+    # Figure out how many epochs there were
+    epochs = range(len(results['train_loss']))
+
+    # Setup a plot 
+    plt.figure(figsize=(15, 7))
+
+    # Plot loss
+    plt.subplot(1, 2, 1)
+    plt.plot(epochs, loss, label='train_loss')
+    plt.plot(epochs, test_loss, label='test_loss')
+    plt.title('Loss')
+    plt.xlabel('Epochs')
+    plt.legend()
+
+    # Plot accuracy
+    plt.subplot(1, 2, 2)
+    plt.plot(epochs, accuracy, label='train_accuracy')
+    plt.plot(epochs, test_accuracy, label='test_accuracy')
+    plt.title('Accuracy')
+    plt.xlabel('Epochs')
+    plt.legend();   
+   
+ 
 
 def plot_matrix(model: nn.Module,
                 data: DataLoader,

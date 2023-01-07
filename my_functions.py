@@ -208,7 +208,7 @@ def test_step(model: torch.nn.Module,
     # Adjust metrics to get average loss and accuracy per batch 
         test_loss = test_loss / len(dataloader)
         test_acc = test_acc / len(dataloader)
-        return test_loss, test_acc
+    return test_loss, test_acc
  
 # 1. Take in various parameters required for training and test steps
 # 1. Take in various parameters required for training and test steps

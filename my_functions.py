@@ -63,11 +63,6 @@ def plot_transformed_images(image_paths, transform, n=3, seed=42):
              ax[1].axis("off")
 
              fig.suptitle(f"Class: {image_path.parent.stem}", fontsize=16)
-
-     plot_transformed_images(image_path_list, 
-                         transform=data_transform, 
-                         n=3)
-
    
    
 def show_data(data):

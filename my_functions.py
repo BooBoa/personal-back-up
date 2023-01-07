@@ -204,9 +204,9 @@ def test_step(model: torch.nn.Module,
             test_pred_labels = torch.argmax(torch.softmax(test_logits, dim=1), dim=1)
             test_acc += ((test_pred_labels == y).sum() / len(test_pred_labels))
             
-    # Adjust metrics to get average loss and accuracy per batch 
-    test_loss = test_loss / len(dataloader)
-    test_acc = test_acc / len(dataloader)
+        # Adjust metrics to get average loss and accuracy per batch 
+        test_loss = test_loss / len(dataloader)
+        test_acc = test_acc / len(dataloader)
     return test_loss, test_acc
  
 # 1. Take in various parameters required for training and test steps

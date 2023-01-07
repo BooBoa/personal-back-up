@@ -2,7 +2,8 @@ import torch
 from torch import nn
 import torchvision
 from torchvision import transforms, datasets
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader
+from torch.utils.data import Dataset
 import matplotlib.pyplot as plt
 import os
 import pandas as pd

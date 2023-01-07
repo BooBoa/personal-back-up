@@ -201,7 +201,7 @@ def test_step(model: torch.nn.Module,
             test_loss += t_loss.item()
             
             # Calculate and accumulate accuracy
-            test_pred_labels = torch.argmax(test_logits, dim=1)
+            test_pred_labels = torch.argmax(torch.softmax(test_logits, dim=1), dim=1)
             test_acc += ((test_pred_labels == y).sum().item()/len(test_pred_labels))
             
         # Adjust metrics to get average loss and accuracy per batch 
@@ -227,7 +227,7 @@ def train(model: torch.nn.Module,
     
     # 3. Loop through training and testing steps for a number of epochs
     for epoch in tqdm(range(epochs)):
-        print(f"\n°º¤ø,¸¸,ø¤º°`°º¤ø,¸,ø¤°º¤ø,¸¸,ø¤º°`°º¤ø,¸\nEpoch {epoch+1}")
+        print(f"\n°º¤ø,¸¸,ø¤º°`°º¤ø,¸,ø¤°º¤ø,¸¸,ø¤º°`°º¤ø,")
         train_loss, train_acc = train_step(model=model,
                                            dataloader=train_dataloader,
                                            loss_fn=loss_fn,
@@ -239,10 +239,10 @@ def train(model: torch.nn.Module,
         
         # 4. Print out what's happening
         print(
-            f"Epoch: {epoch+1} | "
+            f"\nEpoch: {epoch+1} | "
             f"train_loss: {train_loss:.4f} | "
             f"train_acc: {train_acc:.4f} | "
-            f"test_loss: {test_loss:.4f} | "
+            f"\ntest_loss: {test_loss:.4f} | "
             f"test_acc: {test_acc:.4f}"
         )
 

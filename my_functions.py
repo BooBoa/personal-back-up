@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import os
 import pandas as pd
 from torchvision.io import read_image
-from tqdm import tqdm
+from tqdm import tqdm_notebook as tqdm
 from timeit import default_timer as timer
 import random
 from torchvision.transforms.functional import pil_to_tensor

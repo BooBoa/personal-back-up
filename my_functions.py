@@ -232,7 +232,7 @@ def train(model: torch.nn.Module,
                                            loss_fn=loss_fn,
                                            optimizer=optimizer)
         test_loss, test_acc = test_step(model=model,
-                                      dataloader=dataloader,
+                                      dataloader=test_dataloader,
                                       loss_fn=loss_fn)
         
         

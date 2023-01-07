@@ -1,5 +1,6 @@
 import torch
 from torch import nn
+import torchvision
 from torchvision import transforms, datasets
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
@@ -14,7 +15,10 @@ import mlxtend
 from torchmetrics import ConfusionMatrix
 from mlxtend.plotting import plot_confusion_matrix
 import numpy as np
-
+import zipfile
+from pathlib import Path
+from typing import List
+import requests
 device = "cuda" if torch.cuda.is_available() else "cpu"
 #def import_matrix():
 #  #try:
@@ -27,56 +31,56 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
    # print(f"mlxtend version: {mlxtend.__version__}")
 
 def plot_transformed_images(image_paths, transform, n=3, seed=42):
-    """Plots a series of random images from image_paths.
+     """Plots a series of random images from image_paths.
 
-    Will open n image paths from image_paths, transform them
-    with transform and plot them side by side.
+     Will open n image paths from image_paths, transform them
+     with transform and plot them side by side.
 
-    Args:
-        image_paths (list): List of target image paths. 
-        transform (PyTorch Transforms): Transforms to apply to images.
-        n (int, optional): Number of images to plot. Defaults to 3.
-        seed (int, optional): Random seed for the random generator. Defaults to 42.
-    """
-    random.seed(seed)
-    random_image_paths = random.sample(image_paths, k=n)
-    for image_path in random_image_paths:
-        with Image.open(image_path) as f:
-            fig, ax = plt.subplots(1, 2)
-            ax[0].imshow(f) 
-            ax[0].set_title(f"Original \nSize: {f.size}")
-            ax[0].axis("off")
+     Args:
+         image_paths (list): List of target image paths. 
+         transform (PyTorch Transforms): Transforms to apply to images.
+         n (int, optional): Number of images to plot. Defaults to 3.
+         seed (int, optional): Random seed for the random generator. Defaults to 42.
+     """
+     random.seed(seed)
+     random_image_paths = random.sample(image_paths, k=n)
+     for image_path in random_image_paths:
+         with Image.open(image_path) as f:
+             fig, ax = plt.subplots(1, 2)
+             ax[0].imshow(f) 
+             ax[0].set_title(f"Original \nSize: {f.size}")
+             ax[0].axis("off")
 
-            # Transform and plot image
-            # Note: permute() will change shape of image to suit matplotlib 
-            # (PyTorch default is [C, H, W] but Matplotlib is [H, W, C])
-            transformed_image = transform(f).permute(1, 2, 0) 
-            ax[1].imshow(transformed_image) 
-            ax[1].set_title(f"Transformed \nSize: {transformed_image.shape}")
-            ax[1].axis("off")
+             # Transform and plot image
+             # Note: permute() will change shape of image to suit matplotlib 
+             # (PyTorch default is [C, H, W] but Matplotlib is [H, W, C])
+             transformed_image = transform(f).permute(1, 2, 0) 
+             ax[1].imshow(transformed_image) 
+             ax[1].set_title(f"Transformed \nSize: {transformed_image.shape}")
+             ax[1].axis("off")
 
-            fig.suptitle(f"Class: {image_path.parent.stem}", fontsize=16)
+             fig.suptitle(f"Class: {image_path.parent.stem}", fontsize=16)
 
-plot_transformed_images(image_path_list, 
-                        transform=data_transform, 
-                        n=3)
-   
+     plot_transformed_images(image_path_list, 
+                         transform=data_transform, 
+                         n=3)
+
    
    
 def show_data(data):
-    labels_map = data.classes
+   labels_map = data.classes
 
-    figure = plt.figure(figsize=(8, 8))
-    cols, rows = 3, 3
-    for i in range(1, cols * rows + 1):
-        sample_idx = torch.randint(len(data), size=(1,)).item()
-        img, label = data[sample_idx]
-        img = img.squeeze()
-        figure.add_subplot(rows, cols, i)
-        plt.title(labels_map[label], c="g")
-        plt.imshow(img.permute(1, 2, 0), cmap="gray")
-        plt.axis(False)
-    plt.show()
+   figure = plt.figure(figsize=(8, 8))
+   cols, rows = 3, 3
+   for i in range(1, cols * rows + 1):
+       sample_idx = torch.randint(len(data), size=(1,)).item()
+       img, label = data[sample_idx]
+       img = img.squeeze()
+       figure.add_subplot(rows, cols, i)
+       plt.title(labels_map[label], c="g")
+       plt.imshow(img.permute(1, 2, 0), cmap="gray")
+       plt.axis(False)
+   plt.show()
     
     
 def display_random_images(dataset: torch.utils.data.dataset.Dataset,

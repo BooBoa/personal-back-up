@@ -210,6 +210,7 @@ def test_step(model: torch.nn.Module,
     
     return test_loss, test_acc
  
+# 1. Take in various parameters required for training and test steps
 def train(model: torch.nn.Module, 
           train_dataloader: torch.utils.data.DataLoader, 
           test_dataloader: torch.utils.data.DataLoader, 
@@ -230,10 +231,9 @@ def train(model: torch.nn.Module,
                                            dataloader=train_dataloader,
                                            loss_fn=loss_fn,
                                            optimizer=optimizer)
-      
         test_loss, test_acc = test_step(model=model,
-                                        dataloader=test_dataloader,
-                                        loss_fn=loss_fn)
+            dataloader=test_dataloader,
+            loss_fn=loss_fn)
         
         # 4. Print out what's happening
         print(
@@ -245,14 +245,16 @@ def train(model: torch.nn.Module,
         )
 
         # 5. Update results dictionary
-       results["train_loss"].append(train_loss)
-       results["train_acc"].append(train_acc)
-       results["test_loss"].append(test_loss)
-       results["test_acc"].append(test_acc)
+        results["train_loss"].append(train_loss)
+        results["train_acc"].append(train_acc)
+        results["test_loss"].append(test_loss)
+        results["test_acc"].append(test_acc)
 
     # 6. Return the filled results at the end of the epochs
     return results
 
+ 
+  
 
 
 # 1. Subclass torch.utils.data.Dataset

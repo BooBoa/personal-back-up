@@ -18,7 +18,7 @@ from mlxtend.plotting import plot_confusion_matrix
 import numpy as np
 import zipfile
 from pathlib import Path
-from typing import List, Tuple, Dict
+from typing import *
 import requests
 from PIL import Image
 device = "cuda" if torch.cuda.is_available() else "cpu"

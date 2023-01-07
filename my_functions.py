@@ -231,9 +231,10 @@ def train(model: torch.nn.Module,
                                            dataloader=train_dataloader,
                                            loss_fn=loss_fn,
                                            optimizer=optimizer)
-        test_loss, test_acc = test_step(model=model,
-            dataloader=test_dataloader,
-            loss_fn=loss_fn)
+      test_loss, test_acc = test_step(model=model,
+                                      dataloader=dataloader,
+                                      loss_fn=loss_fn)
+        
         
         # 4. Print out what's happening
         print(

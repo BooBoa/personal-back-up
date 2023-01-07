@@ -202,7 +202,7 @@ def test_step(model: torch.nn.Module,
             
             # Calculate and accumulate accuracy
             test_pred_labels = torch.argmax(torch.softmax(test_logits, dim=1), dim=1)
-            test_acc += (test_pred_labels == y).sum()/len(test_pred_labels)
+            test_acc += ((test_pred_labels == y).sum() / len(test_pred_labels))
             
     # Adjust metrics to get average loss and accuracy per batch 
     test_loss = test_loss / len(dataloader)
@@ -231,7 +231,7 @@ def train(model: torch.nn.Module,
                                            dataloader=train_dataloader,
                                            loss_fn=loss_fn,
                                            optimizer=optimizer)
-      test_loss, test_acc = test_step(model=model,
+        test_loss, test_acc = test_step(model=model,
                                       dataloader=dataloader,
                                       loss_fn=loss_fn)
         

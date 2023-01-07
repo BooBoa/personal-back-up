@@ -20,6 +20,7 @@ import zipfile
 from pathlib import Path
 from typing import List
 import requests
+from Pil import Image
 device = "cuda" if torch.cuda.is_available() else "cpu"
 #def import_matrix():
 #  #try:

@@ -250,42 +250,6 @@ def train(model: torch.nn.Module,
 
     # 6. Return the filled results at the end of the epochs
     return results
- 
- 
-   
-
-def eval_model(model: torch.nn.Module,
-               data_loader: torch.utils.data.DataLoader,
-               loss_fn: torch.nn.Module,
-               optimizer: torch.nn.Module,
-               device: torch.device):
-    """Returns a dictionary containing the results of model predicting on data_loader."""
-    optimizer = optimizer
-    size = len(data_loader.dataset)
-    num_batches = len(data_loader)
-    test_loss, correct = 0, 0
-
-    model.eval()
-    with torch.inference_mode():
-        for X, y in tqdm(data_loader):
-            # Make our data device agnostic
-            X, y = X.to(device), y.to(device)
-            # Make predictions
-            pred = model(X)
-            test_loss += loss_fn(pred, y).item()
-            correct += (pred.argmax(1) == y).type(torch.float).sum().item()
-
-    test_loss /= num_batches
-    correct /= size
-
-    return {"model_name": model.__class__.__name__,
-            "loss_fn": loss_fn.__class__.__name__,
-            "optimzer": optimizer.__class__.__name__,
-            "model_loss": test_loss,
-            "model_acc": f"{(100 * correct):.1f)%}
-
-
-
 
 
 

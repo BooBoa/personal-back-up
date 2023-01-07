@@ -198,17 +198,18 @@ def test_step(model: torch.nn.Module,
 
             # 2. Calculate and accumulate loss
             t_loss = loss_fn(test_pred_logits, y)
-            test_loss += t_loss.item()
+            test_loss += t_loss()
             
             # Calculate and accumulate accuracy
             test_pred_labels = torch.argmax(test_pred_logits, dim=1)
-            test_acc += (test_pred_labels == y).sum().item/len(test_pred_labels)
+            test_acc += (test_pred_labels == y).sum().item()/len(test_pred_logits)
             
     # Adjust metrics to get average loss and accuracy per batch 
     test_loss = test_loss / len(dataloader)
     test_acc = test_acc / len(dataloader)
     
-    return test_loss, test_acc
+    return test_loss, test_acctest_acc += accuracy_fn(y_true=y,
+                              y_pred=test_pred.argmax(dim=1))
 
  
 def train(model: torch.nn.Module, 
@@ -231,9 +232,10 @@ def train(model: torch.nn.Module,
                                            dataloader=train_dataloader,
                                            loss_fn=loss_fn,
                                            optimizer=optimizer)
+      
         test_loss, test_acc = test_step(model=model,
-            dataloader=test_dataloader,
-            loss_fn=loss_fn)
+                                        dataloader=test_dataloader,
+                                        loss_fn=loss_fn)
         
         # 4. Print out what's happening
         print(
@@ -245,10 +247,10 @@ def train(model: torch.nn.Module,
         )
 
         # 5. Update results dictionary
-        results["train_loss"].append(train_loss)
-        results["train_acc"].append(train_acc)
-        results["test_loss"].append(test_loss)
-        results["test_acc"].append(test_acc)
+         results["train_loss"].append(train_loss)
+         results["train_acc"].append(train_acc)
+         results["test_loss"].append(test_loss)
+         results["test_acc"].append(test_acc)
 
     # 6. Return the filled results at the end of the epochs
     return results

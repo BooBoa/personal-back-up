@@ -282,7 +282,7 @@ def eval_model(model: torch.nn.Module,
             "loss_fn": loss_fn.__class__.__name__,
             "optimzer": optimizer.__class__.__name__,
             "model_loss": test_loss,
-            "model_acc": f"{(100 * correct):.1f}%}
+            "model_acc": f"{(100 * correct):.1f)%}
 
 
 

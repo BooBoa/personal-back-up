@@ -207,7 +207,7 @@ def test_step(model: torch.nn.Module,
             
             # Calculate and accumulate accuracy
             test_pred_labels = test_pred_logits.argmax(dim=1)
-            test_acc += ((test_pred_labels == y).sum().item()/len(test_pred_labels))
+            test_acc += (test_pred_labels==y).sum().item()/len(test_pred_labels)
             
     # Adjust metrics to get average loss and accuracy per batch 
     test_loss = test_loss / len(dataloader)

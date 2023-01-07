@@ -80,7 +80,7 @@ def show_data(data):
     
     
 def display_random_images(dataset: torch.utils.data.dataset.Dataset,
-                          classes: List[str] = None,
+                          classes,
                           n: int = 10,
                           display_shape: bool = True,
                           seed: int = None):
